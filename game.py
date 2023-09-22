@@ -1,9 +1,6 @@
 import pygame
 import sys
 
-# Initialize Pygame
-pygame.init()
-
 # Constants for the window dimensions
 WIDTH = 1200
 HEIGHT = 800
@@ -12,53 +9,23 @@ HEIGHT = 800
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 
-# Create the game window
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Stick Figure")
 
-# Define the initial character position
-character_x = 200
-character_y = 200
+def initialize():
+    # Initialize Pygame
+    pygame.init() 
 
-left = False
-right = False
+    # Create the game window
+    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    pygame.display.set_caption("Stick Figure")
 
-# Game loop
-running = True
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
+    # Define the initial character position
+    character_x = 200
+    character_y = 200
 
-        
-    keys = pygame.key.get_pressed()
-
-    if keys[pygame.K_LEFT]: 
-        left = True
-        if character_x > 30: character_x -= .5
-        
-        
-    if keys[pygame.K_RIGHT]: 
-        right = True
-        if character_x < WIDTH - 30: character_x += .5
-        
-
-    
-    
-        
+    return screen, character_x, character_y
 
 
-
-        # elif event.type == pygame.KEYDOWN:
-
-        #     # if event.key == pygame.K_LEFT:
-        #     #     while (event.type != pygame.KEYUP):
-        #     #         character_x -= 20
-
-        #     if event.key == pygame.K_LEFT:
-        #         character_x -= 20  # Move character left
-        #     elif event.key == pygame.K_RIGHT:
-        #         character_x += 20  # Move character right
+def drawCharacters(screen, character_x, character_y):
 
     # Clear the screen
     screen.fill(WHITE)
@@ -74,6 +41,48 @@ while running:
     # Update the display
     pygame.display.flip()
 
-# Quit Pygame
-pygame.quit()
-sys.exit()
+
+def engine(screen, character_x, character_y):
+
+    # Game loop
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+
+            
+        keys = pygame.key.get_pressed()
+
+        if keys[pygame.K_LEFT]: 
+            left = True
+            if character_x > 30: character_x -= .5
+            
+            
+        if keys[pygame.K_RIGHT]: 
+            right = True
+            if character_x < WIDTH - 30: character_x += .5
+
+        drawCharacters(screen, character_x, character_y)
+
+    pygame.quit()
+    sys.exit()
+
+
+def main():
+
+    #initialize variables
+    left = False
+    right = False
+
+    #set up the window and character placement
+    screen, character_x, character_y = initialize()
+
+    #run the game
+    engine(screen, character_x, character_y)
+ 
+
+main()
+        
+
+   
