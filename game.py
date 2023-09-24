@@ -10,6 +10,10 @@ HEIGHT = 800
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
+GREY = (155, 155, 155)
+GREEN = (0, 255, 0)
+BLUE = (0, 0, 255)
+CYAN = (0, 200, 255)
 
 
 def initialize():
@@ -42,7 +46,7 @@ def initialize():
     return screen, character_x, character_y, character_x1, character_y1, p1Jab, p2Jab, p1Health, p2Health, gameOver, p1Block, p2Block
 
 
-def drawCharacters(screen, character_x, character_y, character_x1, character_y1, p1Jab, p2Jab, p1Health, p2Health, frameTracker1, frameTracker2, p1Block, p2Block):
+def drawCharacters(screen, character_x, character_y, character_x1, character_y1, p1Jab, p2Jab, p1Health, p2Health, frameTracker1, frameTracker2, p1Block, p2Block, p1HitStun, p2HitStun, p1BlockHealth, p2BlockHealth, p1Kick, p2Kick, p1Special, p2Special, p1Kame, p2Kame, p1KameX, p2KameX):
 
     # Clear the screen
     screen.fill(WHITE)
@@ -50,7 +54,10 @@ def drawCharacters(screen, character_x, character_y, character_x1, character_y1,
     font = pygame.font.Font(None, 36)
 
     # Draw the stick figure at the updated position
-    pygame.draw.circle(screen, BLACK, (character_x1, character_y1 - 30), 30)  # Head
+    if p1HitStun > 0:
+        pygame.draw.circle(screen, GREY, (character_x1 - 3, character_y1 - 28), 30)  # Head
+    else:
+        pygame.draw.circle(screen, BLACK, (character_x1, character_y1 - 30), 30)  # Head
     pygame.draw.line(screen, BLACK, (character_x1, character_y1), (character_x1 - 20, character_y1 + 100), 6)  # Body
     if p1Block:
         pygame.draw.line(screen, BLACK, (character_x1 - 3, character_y1 + 15), (character_x1 + 15, character_y1 + 45), 5)  # Left arm
@@ -88,11 +95,16 @@ def drawCharacters(screen, character_x, character_y, character_x1, character_y1,
         pygame.draw.circle(screen, BLACK, (character_x1 + 40, character_y1 + 20), 7) # Right hand
     pygame.draw.line(screen, BLACK, (character_x1 - 20, character_y1 + 100), (character_x1 - 45, character_y1 + 170), 6)  # Left leg
     pygame.draw.line(screen, BLACK, (character_x1 - 20, character_y1 + 100), (character_x1 + 20, character_y1 + 130), 6)  # Right leg
-    pygame.draw.line(screen, BLACK, (character_x1 + 20, character_y1 + 130), (character_x1 + 35, character_y1 + 170), 6)  # Right calf
+    if p1Kick:
+            pygame.draw.line(screen, BLACK, (character_x1 + 20, character_y1 + 130), (character_x1 + 60, character_y1 + 155), 6)  # Right calf
+    else:
+        pygame.draw.line(screen, BLACK, (character_x1 + 20, character_y1 + 130), (character_x1 + 35, character_y1 + 170), 6)  # Right calf
 
 
-
-    pygame.draw.circle(screen, RED, (character_x, character_y - 30), 30)  # Head
+    if p2HitStun > 0:
+        pygame.draw.circle(screen, GREY, (character_x + 3, character_y - 28), 30)  # Head
+    else:
+        pygame.draw.circle(screen, RED, (character_x, character_y - 30), 30)  # Head
     pygame.draw.line(screen, RED, (character_x, character_y), (character_x + 20, character_y + 100), 5)  # Body
     if p2Block:
         pygame.draw.line(screen, RED, (character_x + 3, character_y + 15), (character_x - 15, character_y + 45), 5)  # Left arm
@@ -130,46 +142,87 @@ def drawCharacters(screen, character_x, character_y, character_x1, character_y1,
         pygame.draw.circle(screen, RED, (character_x - 40, character_y + 20), 7) # Right hand
     pygame.draw.line(screen, RED, (character_x + 20, character_y + 100), (character_x + 45, character_y + 170), 5)  # Left leg
     pygame.draw.line(screen, RED, (character_x + 20, character_y + 100), (character_x - 20, character_y + 130), 5)  # Right leg
-    pygame.draw.line(screen, RED, (character_x - 20, character_y + 130), (character_x - 35, character_y + 170), 5)  # Right calf
+    if p2Kick:
+        pygame.draw.line(screen, RED, (character_x - 20, character_y + 130), (character_x - 60, character_y + 155), 5)  # Right calf
+    else:
+        pygame.draw.line(screen, RED, (character_x - 20, character_y + 130), (character_x - 35, character_y + 170), 5)  # Right calf
 
-    p1_bar = (p1Health / 100 ) * (WIDTH // 3)
-    pygame.draw.rect(screen, RED, (0, 50, p1_bar, 20))
+    p1_health = (p1Health / 100 ) * (WIDTH // 3)
+    pygame.draw.rect(screen, RED, (0, 50, p1_health, 20))
     
-    p2_bar = (p2Health / 100 ) * (WIDTH // 3)
-    pygame.draw.rect(screen, RED, (WIDTH - p2_bar, 50, p2_bar, 20))
+    p2_health = (p2Health / 100 ) * (WIDTH // 3)
+    pygame.draw.rect(screen, RED, (WIDTH - p2_health, 50, p2_health, 20))
+    
+    p1_block = (p1BlockHealth / 100) * (WIDTH // 5)
+    pygame.draw.rect(screen, GREEN, (0, 80, p1_block, 15))
+    
+    p2_block = (p2BlockHealth / 100) * (WIDTH // 5)
+    pygame.draw.rect(screen, GREEN, (WIDTH - p2_block, 80, p2_block, 15))
+    
+    if p1Special > 100: p1Special = 100
+    if p2Special > 100: p2Special = 100
+    p1_special = (p1Special / 100) * (WIDTH // 5)
+    if p1Special == 100:
+        pygame.draw.rect(screen, BLUE, (0, HEIGHT - 100, p1_special, 10))
+    else: 
+        pygame.draw.rect(screen, BLACK, (0, HEIGHT - 100, p1_special, 10))
+    p2_special = (p2Special / 100) * (WIDTH // 5)
+    if p2Special == 100:
+        pygame.draw.rect(screen, BLUE, (WIDTH - p2_special, HEIGHT - 100, p2_special, 10))
+    else: 
+        pygame.draw.rect(screen, BLACK, (WIDTH - p2_special, HEIGHT - 100, p2_special, 10))
     # Update the display
-    if p1Health == 0 and p2Health == 0:
+    if p1Health <= .5 and p2Health <= .5:
         screen.fill(WHITE)
         text = font.render("TIE     press (r) to restart", True, (0,0,0))  # Text, antialiasing, color
         text_rect = text.get_rect()
         text_rect.center = (WIDTH / 2, HEIGHT / 2)
         screen.blit(text, text_rect)
-    elif p1Health == 0:
+    elif p1Health <= .5:
         screen.fill(WHITE)
         text = font.render("PLAYER 2 WINS   press (r) to restart", True, (0,0,0))  # Text, antialiasing, color
         text_rect = text.get_rect()
         text_rect.center = (WIDTH / 2, HEIGHT / 2)
         screen.blit(text, text_rect)
-    elif p2Health == 0:
+    elif p2Health <= .5:
         screen.fill(WHITE)
         text = font.render("PLAYER 1 WINS   press (r) to restart", True, (0,0,0))  # Text, antialiasing, color
         text_rect = text.get_rect()
         text_rect.center = (WIDTH / 2, HEIGHT / 2)
         screen.blit(text, text_rect)
+    if p1Kame:
+        pygame.draw.circle(screen, CYAN, (p1KameX, character_y + 10), 19)
+    if p2Kame:
+        pygame.draw.circle(screen, CYAN, (p2KameX, character_y + 10), 19)
     pygame.display.flip()
-
 
 def engine(screen, character_x, character_y, character_x1, character_y1, p1Jab, p2Jab, p1Health, p2Health, gameOver, p1Block, p2Block):
     clock = pygame.time.Clock()
     frame = 0
-    frameTracker1 = 0
-    frameTracker2 = 0
-    jabDuration = 8
+    jabTracker1 = 0
+    jabTracker2 = 0
+    kickTracker1 = 0
+    kickTracker2 = 0
+    kickDuration = 8
+    jabDuration = 13
     p1JabConnect = False
     p2JabConnect = False
     p1HitStun = 0
     p2HitStun = 0
-    
+    p1BlockHealth = 100
+    p2BlockHealth = 100
+    p1Kick = False
+    p2Kick = False
+    p1KickConnect = False
+    p2KickConnect = False
+    p1KickHit = False
+    p2KickHit = False
+    p1Kame = False
+    p2Kame = False
+    p1KameX = 0
+    p2KameX = 0
+    p1Special = 0
+    p2Special = 0
     runSpeed = 5
     # Game loop
     running = True
@@ -177,71 +230,154 @@ def engine(screen, character_x, character_y, character_x1, character_y1, p1Jab, 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-        if p1Health <= 0 or p2Health <= 0:
+        if p1Health <= .5 or p2Health <= .5:
             gameOver = True 
         frame += 1    
         
         keys = pygame.key.get_pressed()
         if keys[pygame.K_ESCAPE]: running = False
         if gameOver == False:
-            if keys[pygame.K_c] and p1Jab:
+            if keys[pygame.K_c] and p1Jab and p1HitStun == 0 and not p1Kick:
                 p1Jab = False
                     
-            if keys[pygame.K_SLASH] and p2Jab:
-                if frameTracker1 - frame > 0 or frameTracker2 - frame < -10:
+            if keys[pygame.K_SLASH] and p2Jab and p2HitStun == 0 and not p2Kick:
                     p2Jab = False
-            if keys[pygame.K_LEFT]: 
-                left = True
+            if keys[pygame.K_LEFT] and p2HitStun == 0: 
                 if character_x > 30 and character_x > character_x1 + 80: character_x -= runSpeed
                 
                 
-            if keys[pygame.K_RIGHT]: 
-                right = True
+            if keys[pygame.K_RIGHT] and p2HitStun == 0: 
                 if character_x < WIDTH - 50: character_x += runSpeed
                 
-            if keys[pygame.K_UP]:
-                p2Block = True
+            if keys[pygame.K_UP] and p2HitStun == 0:
+                if p2Jab and not p2Kick:
+                    p2Block = True
             else: p2Block = False
-            if keys[pygame.K_a]:
+            if keys[pygame.K_DOWN] and p2HitStun == 0:
+                if p2Jab and not p2Block:
+                    p2Kick = True
+            if keys[pygame.K_l] and p2Special >= 100:
+                p2Kame = True
+                p2KameX = character_x - 10
+                p2Special = 0
+            if keys[pygame.K_a] and p1HitStun == 0:
                 if character_x1 > 50: character_x1 -= runSpeed
                 
-            if keys[pygame.K_d]:
+            if keys[pygame.K_d] and p1HitStun == 0:
                 if character_x1 < WIDTH - 30 and character_x1 < character_x - 80: character_x1 += runSpeed
             
-            if keys[pygame.K_w]:
-                p1Block = True
+            if keys[pygame.K_w] and p1HitStun == 0:
+                if p1Jab and not p1Kick:
+                    p1Block = True
             else: p1Block = False
-                
-            if frame == frameTracker1: 
+            
+            if keys[pygame.K_s] and p1HitStun == 0:
+                if p1Jab and not p1Block:
+                    p1Kick = True
+            if keys[pygame.K_q] and p1Special >= 100:
+                p1Kame = True
+                p1KameX = character_x1 + 10
+                p1Special = 0
+            if frame == kickTracker1:
+                p1Kick = False
+                kickTracker1 = 0
+                p1KickConnect = False
+            if frame == kickTracker2:
+                p2Kick = False
+                kickTracker2 = 0
+                p2KickConnect = False  
+            if frame == jabTracker1: 
                 p1Jab = True
-                frameTracker1 = 0
+                jabTracker1 = 0
                 p1JabConnect = False
-            if frame == frameTracker2: 
+            if frame == jabTracker2: 
                 p2Jab = True
-                frameTracker2 = 0
+                jabTracker2 = 0
                 p2JabConnect = False
             if not p1Jab and not p1JabConnect:
-                frameTracker1 += 1
-                if frameTracker1 == 4:
-                    frameTracker1 = frame + jabDuration
+                jabTracker1 += 1
+                if jabTracker1 == 4:
+                    jabTracker1 = frame + jabDuration
                     p1JabConnect = True
-                    if character_x1 > character_x - 120 and p2Health != 0 and not p2Block: 
-                        p2Health -= 5
-                        p2HitStun = True
+                    if character_x1 > character_x - 120 and p2Health != 0: 
+                        if not p2Block or p2BlockHealth < 20:
+                            p2Health -= 5
+                            p2HitStun = 1 
+                            if p1Special != 100:
+                                p1Special += 7
+                        else: p2BlockHealth -= 20
             if not p2Jab and not p2JabConnect:
-                frameTracker2 += 1
-                if frameTracker2 == 4:
-                    frameTracker2 = frame + jabDuration
+                jabTracker2 += 1
+                if jabTracker2 == 4:
+                    jabTracker2 = frame + jabDuration
                     p2JabConnect = True
-                    if character_x < character_x1 + 120 and p1Health != 0 and not p1Block: 
-                        p1Health -= 5
-                        p2HitStun = True
-                    
+                    if character_x < character_x1 + 120 and p1Health != 0: 
+                        if not p1Block or p1BlockHealth < 20:
+                            p1Health -= 5
+                            p1HitStun = 1
+                            if p2Special != 100:
+                                p2Special += 7
+                        else: p1BlockHealth -= 20
+                            
+            if p1Kick and not p1KickConnect:
+                kickTracker1 += 1
+                if kickTracker1 == 4:
+                    kickTracker1 = frame + kickDuration
+                    p1KickConnect = True
+                    if character_x1 > character_x - 95 and p2Health != 0:
+                        if p2Block or p2BlockHealth < 20:
+                            p2Health -= 4
+                            p2HitStun = 1
+                            p1KickHit = True
+                            if p1Special != 100:
+                                p1Special += 7
+                        else: p2BlockHealth -= 20
+            if p2Kick and not p2KickConnect:
+                kickTracker2 += 1
+                if kickTracker2 == 4:
+                    kickTracker2 = frame + kickDuration
+                    p2KickConnect = True
+                    if character_x < character_x1 + 95 and p1Health != 0:
+                        if p1Block or p1BlockHealth < 20:
+                            p1Health -= 4
+                            p1HitStun = 1
+                            p2KickHit = True
+                            if p2Special != 100:
+                                p2Special += 7
+                        else: p1BlockHealth -= 20
         if gameOver == True:
             if keys[pygame.K_r]:
                 main()
-        drawCharacters(screen, character_x, character_y, character_x1, character_y1, p1Jab, p2Jab, p1Health, p2Health, frameTracker1, frameTracker2, p1Block, p2Block)
+        if p1HitStun > 0:
+            p1HitStun += 1
+            if p1HitStun > 7:
+                p1HitStun = 0
+        if p2HitStun > 0:
+            p2HitStun += 1
+            if p2HitStun > 7:
+                p2HitStun = 0
+        if p1HitStun == 0 and not gameOver: 
+            if p1Health < 100:
+                p1Health += .05
+            if p1BlockHealth < 100:
+                p1BlockHealth += .2
+        if p2HitStun == 0 and not gameOver: 
+            if p2Health < 100:
+                p2Health += .05
+            if p2BlockHealth < 100:
+                p2BlockHealth += .2
+        if p1Kame: p1KameX += 6
+        if p2Kame: p2KameX -= 6
+        if p1KameX >= character_x - 10 and p1Kame:
+            p1Kame = False
+            p2Health -= 30
+        if p2KameX <= character_x1 + 10 and p2Kame:
+            p2Kame = False
+            p1Health -= 30
+        drawCharacters(screen, character_x, character_y, character_x1, character_y1, p1Jab, p2Jab, p1Health, p2Health, jabTracker1, jabTracker2, p1Block, p2Block, p1HitStun, p2HitStun, p1BlockHealth, p2BlockHealth, p1Kick, p2Kick, p1Special, p2Special, p1Kame, p2Kame, p1KameX, p2KameX)
         clock.tick(30)
+        p1KickHit = False
+        p2KickHit = False
         
     pygame.quit()
     sys.exit()
